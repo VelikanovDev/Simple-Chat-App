@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
-import { Alert, Button, Form, FormGroup } from "react-bootstrap";
+import { Button, Form, FormGroup } from "react-bootstrap";
+import ChatWindow from "../components/ChatWindow";
 
 const ChatPage = ({ username }) => {
   const [messages, setMessages] = useState([]);
@@ -9,7 +10,7 @@ const ChatPage = ({ username }) => {
   const stompClientRef = useRef(null);
   const subscriptionRef = useRef(null);
   const initializedRef = useRef(false);
-  const [error, setError] = useState("");
+  const [isMessageEmpty, setIsMessageEmpty] = useState(false);
 
   useEffect(() => {
     if (!initializedRef.current) {
@@ -69,7 +70,7 @@ const ChatPage = ({ username }) => {
 
   const sendMessage = () => {
     if (
-      message.trim() &&
+      message.trim() !== "" &&
       stompClientRef.current &&
       stompClientRef.current.connected
     ) {
@@ -84,9 +85,9 @@ const ChatPage = ({ username }) => {
         body: JSON.stringify(chatMessage),
       });
       setMessage("");
-      setError("");
+      setIsMessageEmpty(false);
     } else if (message.trim() === "") {
-      setError("Message cannot be empty");
+      setIsMessageEmpty(true);
     } else {
       console.error("STOMP client is not connected");
     }
@@ -99,52 +100,7 @@ const ChatPage = ({ username }) => {
     >
       <h1 className="text-primary">Spring WebSocket Chat App</h1>
       <div className="w-100">
-        <div
-          className="border border-black rounded p-2 mt-2 mb-2 position-relative overflow-y-auto"
-          style={{ width: "600px", height: "400px" }}
-        >
-          <div className="messages-container">
-            {messages.map((msg, index) =>
-              msg.type === "JOIN" ? (
-                <div key={index} className="text-center">
-                  <strong className="text-secondary">
-                    {msg.sender} joined the chat
-                  </strong>
-                </div>
-              ) : msg.type === "LEAVE" ? (
-                <div key={index} className="text-center">
-                  <strong className="text-secondary">
-                    {msg.sender} left the chat
-                  </strong>
-                </div>
-              ) : (
-                <div key={index}>
-                  <span
-                    className="bg-primary d-inline-flex rounded-circle justify-content-center align-items-center"
-                    style={{
-                      textAlign: "center",
-                      width: "1.5rem",
-                      height: "1.5rem",
-                      marginRight: "5px",
-                    }}
-                  >
-                    {msg.sender[0]}
-                  </span>
-                  <strong className="text-primary">{msg.sender}: </strong>
-                  {msg.content}
-                </div>
-              ),
-            )}
-          </div>
-        </div>
-        {error && (
-          <Alert
-            severity="error"
-            className="text-black bg-danger border border-danger rounded mt-1 mb-1 h-25"
-          >
-            {error}
-          </Alert>
-        )}
+        <ChatWindow messages={messages} />
         <Form
           onSubmit={(e) => {
             e.preventDefault();
@@ -157,6 +113,7 @@ const ChatPage = ({ username }) => {
               aria-describedby="basic-addon2"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              isInvalid={isMessageEmpty}
             />
             <Button
               type="submit"
