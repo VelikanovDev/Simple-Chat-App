@@ -20,7 +20,9 @@ const UsernamePage = () => {
       className="d-flex flex-column justify-content-center align-items-center
           rounded border border-light-subtle bg-light shadow-lg p-5"
     >
-      <h1 className="text-primary">Type your username to enter the Chatroom</h1>
+      <h1 className="text-primary">
+        Type your username to <br /> enter the Chatroom
+      </h1>
       <Form
         onSubmit={(e) => {
           e.preventDefault();

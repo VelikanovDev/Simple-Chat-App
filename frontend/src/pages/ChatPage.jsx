@@ -99,6 +99,44 @@ const ChatPage = ({ username }) => {
     >
       <h1 className="text-primary">Spring WebSocket Chat App</h1>
       <div className="w-100">
+        <div
+          className="border border-black rounded p-2 mt-2 mb-2 position-relative overflow-y-auto"
+          style={{ width: "600px", height: "400px" }}
+        >
+          <div className="messages-container">
+            {messages.map((msg, index) =>
+              msg.type === "JOIN" ? (
+                <div key={index} className="text-center">
+                  <strong className="text-secondary">
+                    {msg.sender} joined the chat
+                  </strong>
+                </div>
+              ) : msg.type === "LEAVE" ? (
+                <div key={index} className="text-center">
+                  <strong className="text-secondary">
+                    {msg.sender} left the chat
+                  </strong>
+                </div>
+              ) : (
+                <div key={index}>
+                  <span
+                    className="bg-primary d-inline-flex rounded-circle justify-content-center align-items-center"
+                    style={{
+                      textAlign: "center",
+                      width: "1.5rem",
+                      height: "1.5rem",
+                      marginRight: "5px",
+                    }}
+                  >
+                    {msg.sender[0]}
+                  </span>
+                  <strong className="text-primary">{msg.sender}: </strong>
+                  {msg.content}
+                </div>
+              ),
+            )}
+          </div>
+        </div>
         {error && (
           <Alert
             severity="error"
@@ -130,20 +168,6 @@ const ChatPage = ({ username }) => {
             </Button>
           </FormGroup>
         </Form>
-        <div>
-          {messages.map((msg, index) =>
-            msg.type === "JOIN" ? (
-              <div key={index}>
-                <strong>{msg.sender} joined the chat</strong>
-              </div>
-            ) : (
-              <div key={index}>
-                <strong>{msg.sender}: </strong>
-                {msg.content}
-              </div>
-            ),
-          )}
-        </div>
       </div>
     </div>
   );
